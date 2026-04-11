@@ -1,0 +1,145 @@
+import type { Product, Store } from "@/types/domain";
+
+export const stores: Store[] = [
+  {
+    id: "s1",
+    name: "Nanotek",
+    slug: "nanotek",
+    websiteUrl: "https://www.nanotek.lk",
+    district: "Colombo",
+    lastSyncAt: "2026-04-11T07:20:00.000Z",
+  },
+  {
+    id: "s2",
+    name: "Redline Technologies",
+    slug: "redline-technologies",
+    websiteUrl: "https://www.redlinetech.lk",
+    district: "Colombo",
+    lastSyncAt: "2026-04-11T08:10:00.000Z",
+  },
+  {
+    id: "s3",
+    name: "Winsoft",
+    slug: "winsoft",
+    websiteUrl: "https://www.winsoft.lk",
+    district: "Gampaha",
+    lastSyncAt: "2026-04-11T06:45:00.000Z",
+  },
+];
+
+export const products: Product[] = [
+  {
+    id: "p1",
+    slug: "msi-katana-15-b13vfk-rtx4060",
+    title: "MSI Katana 15 B13VFK",
+    brand: "MSI",
+    model: "B13VFK",
+    category: "laptops",
+    specsSummary: ["Core i7 13620H", "RTX 4060 8GB", "16GB DDR5", "512GB NVMe"],
+    updatedAt: "2026-04-11T08:18:00.000Z",
+    offers: [
+      {
+        id: "o1",
+        storeId: "s1",
+        offerUrl: "https://www.nanotek.lk/product/msi-katana-15-b13vfk",
+        currentPriceLkr: 469900,
+        availability: "in_stock",
+        updatedAt: "2026-04-11T08:18:00.000Z",
+        history: [
+          { capturedAt: "2026-04-07T09:00:00.000Z", priceLkr: 489900 },
+          { capturedAt: "2026-04-09T09:00:00.000Z", priceLkr: 479900 },
+          { capturedAt: "2026-04-11T08:18:00.000Z", priceLkr: 469900 },
+        ],
+      },
+      {
+        id: "o2",
+        storeId: "s2",
+        offerUrl: "https://www.redlinetech.lk/product/msi-katana-15",
+        currentPriceLkr: 474500,
+        availability: "limited",
+        updatedAt: "2026-04-11T08:06:00.000Z",
+        history: [
+          { capturedAt: "2026-04-07T09:00:00.000Z", priceLkr: 492000 },
+          { capturedAt: "2026-04-10T09:00:00.000Z", priceLkr: 479000 },
+          { capturedAt: "2026-04-11T08:06:00.000Z", priceLkr: 474500 },
+        ],
+      },
+    ],
+  },
+  {
+    id: "p2",
+    slug: "zotac-rtx-4060-twin-edge-8gb",
+    title: "ZOTAC GeForce RTX 4060 Twin Edge 8GB",
+    brand: "ZOTAC",
+    model: "RTX 4060 Twin Edge",
+    category: "gpu",
+    specsSummary: ["NVIDIA Ada", "8GB GDDR6", "PCIe 4.0", "DLSS 3"],
+    updatedAt: "2026-04-11T08:11:00.000Z",
+    offers: [
+      {
+        id: "o3",
+        storeId: "s2",
+        offerUrl: "https://www.redlinetech.lk/product/rtx4060-zotac",
+        currentPriceLkr: 134500,
+        availability: "in_stock",
+        updatedAt: "2026-04-11T08:11:00.000Z",
+        history: [
+          { capturedAt: "2026-04-06T09:00:00.000Z", priceLkr: 141000 },
+          { capturedAt: "2026-04-09T09:00:00.000Z", priceLkr: 137500 },
+          { capturedAt: "2026-04-11T08:11:00.000Z", priceLkr: 134500 },
+        ],
+      },
+      {
+        id: "o4",
+        storeId: "s3",
+        offerUrl: "https://www.winsoft.lk/product/rtx-4060-zotac",
+        currentPriceLkr: 136900,
+        availability: "in_stock",
+        updatedAt: "2026-04-11T07:12:00.000Z",
+        history: [
+          { capturedAt: "2026-04-06T09:00:00.000Z", priceLkr: 143000 },
+          { capturedAt: "2026-04-10T09:00:00.000Z", priceLkr: 139500 },
+          { capturedAt: "2026-04-11T07:12:00.000Z", priceLkr: 136900 },
+        ],
+      },
+    ],
+  },
+  {
+    id: "p3",
+    slug: "wd-black-sn770-1tb-nvme",
+    title: "WD Black SN770 1TB NVMe SSD",
+    brand: "Western Digital",
+    model: "SN770",
+    category: "ssd",
+    specsSummary: ["1TB", "PCIe Gen4", "5150MB/s read", "M.2 2280"],
+    updatedAt: "2026-04-10T09:05:00.000Z",
+    offers: [
+      {
+        id: "o5",
+        storeId: "s1",
+        offerUrl: "https://www.nanotek.lk/product/wd-sn770-1tb",
+        currentPriceLkr: 33900,
+        availability: "in_stock",
+        updatedAt: "2026-04-10T09:05:00.000Z",
+        history: [
+          { capturedAt: "2026-04-05T09:00:00.000Z", priceLkr: 35900 },
+          { capturedAt: "2026-04-08T09:00:00.000Z", priceLkr: 34900 },
+          { capturedAt: "2026-04-10T09:05:00.000Z", priceLkr: 33900 },
+        ],
+      },
+      {
+        id: "o6",
+        storeId: "s3",
+        offerUrl: "https://www.winsoft.lk/product/wd-black-sn770",
+        currentPriceLkr: 34400,
+        availability: "limited",
+        updatedAt: "2026-04-10T06:45:00.000Z",
+        history: [
+          { capturedAt: "2026-04-05T09:00:00.000Z", priceLkr: 36200 },
+          { capturedAt: "2026-04-09T09:00:00.000Z", priceLkr: 34900 },
+          { capturedAt: "2026-04-10T06:45:00.000Z", priceLkr: 34400 },
+        ],
+      },
+    ],
+  },
+];
