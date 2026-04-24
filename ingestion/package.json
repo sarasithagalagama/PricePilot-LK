@@ -1,0 +1,21 @@
+{
+  "name": "pricepilot-ingestion",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "node scripts/seed.js",
+    "scrape:nanotek": "node scrapers/nanotek.js",
+    "pipeline": "node pipeline/orchestrator.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.4",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.3.1",
+    "node-fetch": "^3.3.2",
+    "puppeteer": "^22.15.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.55.0"
+  }
+}

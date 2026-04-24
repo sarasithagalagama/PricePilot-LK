@@ -1,5 +1,9 @@
 import { products, stores } from "@/mock/seed-data/catalog";
-import { loadCatalogFromSupabase } from "@/services/products/catalog.supabase";
+import {
+  loadCatalogFromSupabase,
+  loadProductDetailFromSupabase,
+  loadStoreDetailFromSupabase,
+} from "@/services/products/catalog.supabase";
 import type { Offer, Product, ProductFilters } from "@/types/domain";
 
 const PAGE_SIZE = 9;
@@ -146,6 +150,30 @@ export async function getProductBySlugRuntime(slug: string) {
   return data.products.find((product) => product.slug === slug);
 }
 
+export async function getProductPageRuntimeData(slug: string) {
+  const supabaseSnapshot = await loadProductDetailFromSupabase(slug);
+
+  if (supabaseSnapshot) {
+    if (!supabaseSnapshot.product) {
+      return {
+        product: null,
+        stores: supabaseSnapshot.stores,
+      };
+    }
+
+    return {
+      product: supabaseSnapshot.product,
+      stores: supabaseSnapshot.stores,
+    };
+  }
+
+  const fallbackData = await getRuntimeCatalogData();
+  return {
+    product: fallbackData.products.find((product) => product.slug === slug) ?? null,
+    stores: fallbackData.stores,
+  };
+}
+
 export async function listStoresRuntime() {
   const data = await getRuntimeCatalogData();
   return data.stores;
@@ -154,6 +182,34 @@ export async function listStoresRuntime() {
 export async function getStoreBySlugRuntime(slug: string) {
   const data = await getRuntimeCatalogData();
   return data.stores.find((store) => store.slug === slug);
+}
+
+export async function getStorePageRuntimeData(slug: string) {
+  const supabaseSnapshot = await loadStoreDetailFromSupabase(slug);
+
+  if (supabaseSnapshot) {
+    return {
+      store: supabaseSnapshot.store,
+      products: supabaseSnapshot.products,
+    };
+  }
+
+  const data = await getRuntimeCatalogData();
+  const store = data.stores.find((item) => item.slug === slug) ?? null;
+
+  if (!store) {
+    return {
+      store: null,
+      products: [],
+    };
+  }
+
+  return {
+    store,
+    products: data.products.filter((product) =>
+      product.offers.some((offer) => offer.storeId === store.id),
+    ),
+  };
 }
 
 export async function listStoreProductsRuntime(storeId: string) {

@@ -17,7 +17,7 @@ import {
 } from "@/lib/supabase/server-auth";
 import {
   getBestOfferForProduct,
-  getRuntimeCatalogData,
+  getProductPageRuntimeData,
 } from "@/services/products/catalog.service";
 
 interface ProductDetailProps {
@@ -31,8 +31,7 @@ interface ProductDetailProps {
 export default async function ProductDetailPage({ params, searchParams }: ProductDetailProps) {
   const { slug } = await params;
   const { message, error } = await searchParams;
-  const { products, stores } = await getRuntimeCatalogData();
-  const product = products.find((item) => item.slug === slug);
+  const { product, stores } = await getProductPageRuntimeData(slug);
 
   if (!product) {
     notFound();

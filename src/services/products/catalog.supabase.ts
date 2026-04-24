@@ -21,7 +21,7 @@ interface DbOffer {
   current_price_lkr: number;
   availability_status: Offer["availability"];
   updated_at: string;
-  offer_price_history: DbOfferHistory[] | null;
+  offer_price_history?: DbOfferHistory[] | null;
 }
 
 interface DbProduct {
@@ -47,6 +47,16 @@ interface DbStore {
 export interface CatalogSnapshot {
   products: Product[];
   stores: Store[];
+}
+
+export interface ProductDetailSnapshot {
+  product: Product | null;
+  stores: Store[];
+}
+
+export interface StoreDetailSnapshot {
+  store: Store | null;
+  products: Product[];
 }
 
 function asObject<T>(value: T | T[] | null): T | null {
@@ -79,7 +89,7 @@ function mapStore(row: DbStore): Store {
   };
 }
 
-function mapProduct(row: DbProduct): Product {
+function mapProduct(row: DbProduct, includeHistory = false): Product {
   const category = asObject(row.categories);
   const brand = asObject(row.brands);
 
@@ -91,6 +101,7 @@ function mapProduct(row: DbProduct): Product {
     availability: normalizeAvailability(offer.availability_status),
     updatedAt: offer.updated_at,
     history: (offer.offer_price_history ?? [])
+      .filter(() => includeHistory)
       .map((item) => ({ capturedAt: item.captured_at, priceLkr: Number(item.price_lkr) }))
       .sort((a, b) => new Date(a.capturedAt).getTime() - new Date(b.capturedAt).getTime()),
   }));
@@ -124,7 +135,7 @@ export async function loadCatalogFromSupabase(): Promise<CatalogSnapshot | null>
     supabase
       .from("products")
       .select(
-        "id, slug, title, model_number, updated_at, categories(slug), brands(name), offers(id, store_id, offer_url, current_price_lkr, availability_status, updated_at, offer_price_history(captured_at, price_lkr))",
+        "id, slug, title, model_number, updated_at, categories(slug), brands(name), offers(id, store_id, offer_url, current_price_lkr, availability_status, updated_at)",
       )
       .eq("is_active", true)
       .order("updated_at", { ascending: false })
@@ -137,6 +148,114 @@ export async function loadCatalogFromSupabase(): Promise<CatalogSnapshot | null>
 
   return {
     stores: (storesResult.data as DbStore[]).map(mapStore),
-    products: (productsResult.data as DbProduct[]).map(mapProduct),
+    products: (productsResult.data as DbProduct[]).map((row) => mapProduct(row, false)),
+  };
+}
+
+export async function loadProductDetailFromSupabase(slug: string): Promise<ProductDetailSnapshot | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createServerSupabaseClient();
+
+  const { data: productData, error: productError } = await supabase
+    .from("products")
+    .select(
+      "id, slug, title, model_number, updated_at, categories(slug), brands(name), offers(id, store_id, offer_url, current_price_lkr, availability_status, updated_at, offer_price_history(captured_at, price_lkr))",
+    )
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .limit(1)
+    .maybeSingle();
+
+  if (productError) {
+    return null;
+  }
+
+  if (!productData) {
+    return {
+      product: null,
+      stores: [],
+    };
+  }
+
+  const product = mapProduct(productData as DbProduct, true);
+  const storeIds = Array.from(new Set(product.offers.map((offer) => offer.storeId)));
+
+  if (storeIds.length === 0) {
+    return {
+      product,
+      stores: [],
+    };
+  }
+
+  const { data: storesData, error: storesError } = await supabase
+    .from("stores")
+    .select("id, name, slug, website_url, district, last_sync_at")
+    .eq("is_active", true)
+    .in("id", storeIds);
+
+  if (storesError || !storesData) {
+    return {
+      product,
+      stores: [],
+    };
+  }
+
+  return {
+    product,
+    stores: (storesData as DbStore[]).map(mapStore),
+  };
+}
+
+export async function loadStoreDetailFromSupabase(slug: string): Promise<StoreDetailSnapshot | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createServerSupabaseClient();
+
+  const { data: storeData, error: storeError } = await supabase
+    .from("stores")
+    .select("id, name, slug, website_url, district, last_sync_at")
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .limit(1)
+    .maybeSingle();
+
+  if (storeError) {
+    return null;
+  }
+
+  if (!storeData) {
+    return {
+      store: null,
+      products: [],
+    };
+  }
+
+  const store = mapStore(storeData as DbStore);
+
+  const { data: productsData, error: productsError } = await supabase
+    .from("products")
+    .select(
+      "id, slug, title, model_number, updated_at, categories(slug), brands(name), offers!inner(id, store_id, offer_url, current_price_lkr, availability_status, updated_at)",
+    )
+    .eq("is_active", true)
+    .eq("offers.store_id", store.id)
+    .order("updated_at", { ascending: false })
+    .limit(300);
+
+  if (productsError || !productsData) {
+    return {
+      store,
+      products: [],
+    };
+  }
+
+  return {
+    store,
+    products: (productsData as DbProduct[]).map((row) => mapProduct(row, false)),
   };
 }

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/product/product-card";
 import { formatColomboDate } from "@/lib/format/date";
-import { getRuntimeCatalogData } from "@/services/products/catalog.service";
+import { getStorePageRuntimeData } from "@/services/products/catalog.service";
 
 interface StoreDetailProps {
   params: Promise<{ slug: string }>;
@@ -9,16 +9,11 @@ interface StoreDetailProps {
 
 export default async function StoreDetailPage({ params }: StoreDetailProps) {
   const { slug } = await params;
-  const { stores, products: allProducts } = await getRuntimeCatalogData();
-  const store = stores.find((item) => item.slug === slug);
+  const { store, products } = await getStorePageRuntimeData(slug);
 
   if (!store) {
     notFound();
   }
-
-  const products = allProducts.filter((product) =>
-    product.offers.some((offer) => offer.storeId === store.id),
-  );
 
   return (
     <div className="space-y-6">
