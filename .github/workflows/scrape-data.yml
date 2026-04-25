@@ -1,12 +1,12 @@
 name: Scrape PricePilot Data
 
 on:
-  schedule:
-    # Run every 6 hours (0, 6, 12, 18 UTC)
-    - cron: "0 0,6,12,18 * * *"
+  # Scheduled trigger paused
+  # schedule:
+  #   - cron: "0 0,6,12,18 * * *"
 
-  # Allow manual trigger
-  workflow_dispatch:
+  # Manual trigger paused
+  # workflow_dispatch:
 
 jobs:
   scrape:
